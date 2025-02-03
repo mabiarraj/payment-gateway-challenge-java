@@ -4,6 +4,7 @@ import com.checkout.payment.gateway.enums.PaymentStatus;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Data
@@ -15,7 +16,7 @@ public class PostPaymentResponse {
   private int expiryMonth;
   private int expiryYear;
   private String currency;
-  private int amount;
+  private BigDecimal amount;
 
   @Override
   public String toString() {

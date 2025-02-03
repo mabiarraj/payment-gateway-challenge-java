@@ -4,6 +4,7 @@ import com.checkout.payment.gateway.model.PostPaymentRequest;
 import com.checkout.payment.gateway.model.PostPaymentResponse;
 import com.checkout.payment.gateway.service.PaymentGatewayService;
 import java.util.UUID;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +29,7 @@ public class PaymentGatewayController {
 
   @PostMapping("/payment")
   public ResponseEntity<PostPaymentResponse> createPayment(
-      @RequestBody PostPaymentRequest postPaymentRequest
+      @Valid @RequestBody PostPaymentRequest postPaymentRequest
   ) {
     return new ResponseEntity<>(paymentGatewayService.processPayment(postPaymentRequest), HttpStatus.CREATED);
   }

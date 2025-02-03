@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.checkout.payment.gateway.exception.EventProcessingException;
+import com.checkout.payment.gateway.exception.PaymentProcessingException;
 import com.checkout.payment.gateway.fixtures.Fixtures;
 import com.checkout.payment.gateway.infrastructure.ImposterPaymentProcessor;
 import com.checkout.payment.gateway.model.BankProcessorRequest;
@@ -69,7 +70,7 @@ class ImposterPaymentProcessorTest {
         .thenReturn(new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR));
 
     // when
-    Exception exception = assertThrows(EventProcessingException.class, () ->
+    Exception exception = assertThrows(PaymentProcessingException.class, () ->
         imposterPaymentProcessor.processPayment(bankProcessorRequest)
     );
 

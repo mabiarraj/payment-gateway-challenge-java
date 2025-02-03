@@ -116,4 +116,32 @@ public class PaymentGatewayServiceTest {
     verify(paymentsRepository, times(1)).add(result);
   }
 
+  @Test
+  void testProcessPayment_ShouldThrowException_WhenExpiryDateIsInvalid() {
+    // Given
+    paymentRequest.setExpiryYear(1999);
+
+    // When
+    Exception exception = assertThrows(IllegalArgumentException.class, () ->
+      paymentGatewayService.processPayment(paymentRequest)
+    );
+
+    // Then
+    assertEquals("Card expiration date must be in the future", exception.getMessage());
+  }
+
+  @Test
+  void testProcessPayment_ShouldThrowException_WhenCurrencyIsInvalid() {
+    // Given
+    paymentRequest.setCurrency("BRL");
+
+    // When
+    Exception exception = assertThrows(IllegalArgumentException.class, () ->
+        paymentGatewayService.processPayment(paymentRequest)
+    );
+
+    // Then
+    assertEquals("Currency is invalid", exception.getMessage());
+  }
+
 }
