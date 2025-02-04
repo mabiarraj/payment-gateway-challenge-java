@@ -12,7 +12,6 @@ import com.checkout.payment.gateway.fixtures.Fixtures;
 import com.checkout.payment.gateway.infrastructure.ImposterPaymentProcessor;
 import com.checkout.payment.gateway.model.BankProcessorRequest;
 import com.checkout.payment.gateway.model.BankProcessorResponse;
-import com.checkout.payment.gateway.model.PaymentResponseTransformer;
 import com.checkout.payment.gateway.model.PostPaymentRequest;
 import com.checkout.payment.gateway.model.PostPaymentResponse;
 import com.checkout.payment.gateway.repository.PaymentsRepository;
@@ -31,9 +30,6 @@ public class PaymentGatewayServiceTest {
 
   @Mock
   private ImposterPaymentProcessor imposterPaymentProcessor;
-
-  @Mock
-  private PaymentResponseTransformer paymentResponseTransformer;
 
   @InjectMocks
   private PaymentGatewayService paymentGatewayService;
@@ -82,8 +78,6 @@ public class PaymentGatewayServiceTest {
   void testProcessPayment_ShouldProcessAndStorePayment_WhenAuthorized() {
     // given
     when(imposterPaymentProcessor.processPayment(any(BankProcessorRequest.class))).thenReturn(bankProcessorResponse);
-    when(paymentResponseTransformer.requestToResponse(any(PostPaymentRequest.class), eq(PaymentStatus.AUTHORIZED)))
-        .thenReturn(paymentResponse);
 
     // when
     PostPaymentResponse result = paymentGatewayService.processPayment(paymentRequest);
@@ -92,7 +86,6 @@ public class PaymentGatewayServiceTest {
     assertNotNull(result);
     assertEquals(PaymentStatus.AUTHORIZED, result.getStatus());
     verify(imposterPaymentProcessor, times(1)).processPayment(any(BankProcessorRequest.class));
-    verify(paymentResponseTransformer, times(1)).requestToResponse(any(PostPaymentRequest.class), eq(PaymentStatus.AUTHORIZED));
     verify(paymentsRepository, times(1)).add(result);
   }
 
@@ -102,8 +95,6 @@ public class PaymentGatewayServiceTest {
     bankProcessorResponse = Fixtures.aBankProcessorResponseUnauthorized();
     when(imposterPaymentProcessor.processPayment(any(BankProcessorRequest.class))).thenReturn(bankProcessorResponse);
     PostPaymentResponse declinedResponse = Fixtures.aPostPaymentResponseDeclined();
-    when(paymentResponseTransformer.requestToResponse(any(PostPaymentRequest.class), eq(PaymentStatus.DECLINED)))
-        .thenReturn(declinedResponse);
 
     // When
     PostPaymentResponse result = paymentGatewayService.processPayment(paymentRequest);
@@ -112,7 +103,6 @@ public class PaymentGatewayServiceTest {
     assertNotNull(result);
     assertEquals(PaymentStatus.DECLINED, result.getStatus());
     verify(imposterPaymentProcessor, times(1)).processPayment(any(BankProcessorRequest.class));
-    verify(paymentResponseTransformer, times(1)).requestToResponse(any(PostPaymentRequest.class), eq(PaymentStatus.DECLINED));
     verify(paymentsRepository, times(1)).add(result);
   }
 

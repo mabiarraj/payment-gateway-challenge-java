@@ -6,7 +6,6 @@ import com.checkout.payment.gateway.exception.EventProcessingException;
 import com.checkout.payment.gateway.infrastructure.PaymentProcessor;
 import com.checkout.payment.gateway.model.BankProcessorRequest;
 import com.checkout.payment.gateway.model.BankProcessorResponse;
-import com.checkout.payment.gateway.model.PaymentResponseTransformer;
 import com.checkout.payment.gateway.model.PostPaymentRequest;
 import com.checkout.payment.gateway.model.PostPaymentResponse;
 import com.checkout.payment.gateway.repository.PaymentsRepository;
@@ -23,13 +22,11 @@ public class PaymentGatewayService {
 
   private final PaymentsRepository paymentsRepository;
   private final PaymentProcessor paymentProcessor;
-  private final PaymentResponseTransformer paymentResponseTransformer;
 
   public PaymentGatewayService(PaymentsRepository paymentsRepository,
-      PaymentProcessor paymentProcessor, PaymentResponseTransformer paymentResponseTransformer) {
+      PaymentProcessor paymentProcessor) {
     this.paymentsRepository = paymentsRepository;
     this.paymentProcessor = paymentProcessor;
-    this.paymentResponseTransformer = paymentResponseTransformer;
   }
 
   public PostPaymentResponse getPaymentById(UUID id) {
@@ -38,30 +35,14 @@ public class PaymentGatewayService {
   }
 
   public PostPaymentResponse processPayment(PostPaymentRequest paymentRequest) {
-    validatePayment(paymentRequest);
+    paymentRequest.validate();
     BankProcessorRequest bankProcessorRequest = createBankProcessorRequest(paymentRequest);
     BankProcessorResponse processorResponse = paymentProcessor.processPayment(bankProcessorRequest);
-
     PaymentStatus paymentStatus =
         processorResponse.getAuthorized() ? PaymentStatus.AUTHORIZED : PaymentStatus.DECLINED;
-    PostPaymentResponse paymentResponse = paymentResponseTransformer.requestToResponse(
-        paymentRequest, paymentStatus);
-
-    paymentsRepository.add(paymentResponse);
-    return paymentResponse;
-  }
-
-  private static void validatePayment(PostPaymentRequest paymentRequest) {
-    if (!paymentRequest.isExpiryDateValid()) {
-      throw new IllegalArgumentException("Card expiration date must be in the future");
-    }
-
-    boolean isValidCurrency = Arrays.stream(Currency.values())
-        .map(Enum::name)
-        .anyMatch(paymentRequest.getCurrency()::equals);
-    if (!isValidCurrency) {
-      throw new IllegalArgumentException("Currency is invalid");
-    }
+    PostPaymentResponse postPaymentResponse = new PostPaymentResponse(paymentRequest, paymentStatus);
+    paymentsRepository.add(postPaymentResponse);
+    return postPaymentResponse;
   }
 
   private static BankProcessorRequest createBankProcessorRequest(PostPaymentRequest paymentRequest) {

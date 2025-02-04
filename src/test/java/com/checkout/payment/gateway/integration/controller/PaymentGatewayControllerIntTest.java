@@ -33,15 +33,15 @@ class PaymentGatewayControllerIntTest {
 
   @Test
   void whenPaymentWithIdExistThenCorrectPaymentIsReturned() throws Exception {
-    PostPaymentResponse payment = PostPaymentResponse.builder()
-        .id(UUID.randomUUID())
-        .amount(BigDecimal.valueOf(10.57))
-        .currency("USD")
-        .status(PaymentStatus.AUTHORIZED)
-        .expiryMonth(12)
-        .expiryYear(2024)
-        .cardNumberLastFour(4321)
-        .build();
+    PostPaymentResponse payment = new PostPaymentResponse(
+        UUID.randomUUID(),
+        PaymentStatus.AUTHORIZED,
+        4321,
+        12,
+        2024,
+        "USD",
+        BigDecimal.valueOf(10.57)
+    );
 
     paymentsRepository.add(payment);
 

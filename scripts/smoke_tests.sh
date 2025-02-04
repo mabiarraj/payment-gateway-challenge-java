@@ -51,3 +51,5 @@ if [[ -z "$response" || "$response" == "null" ]]; then
   echo -e "Error: Could not retrieve second payment"
   exit 1
 fi
+
+echo "Test successful"

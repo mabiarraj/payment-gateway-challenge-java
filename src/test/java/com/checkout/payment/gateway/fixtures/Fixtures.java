@@ -22,25 +22,27 @@ public class Fixtures {
   }
 
   public static PostPaymentResponse aPostPaymentResponseAuthorized() {
-    return PostPaymentResponse.builder()
-        .id(UUID.randomUUID())
-        .amount(BigDecimal.valueOf(100))
-        .currency("USD")
-        .status(PaymentStatus.AUTHORIZED)
-        .expiryMonth(12)
-        .expiryYear(2025)
-        .build();
+    return new PostPaymentResponse(
+        UUID.randomUUID(),
+        PaymentStatus.AUTHORIZED,
+        4321,
+        12,
+        2024,
+        "USD",
+        BigDecimal.valueOf(10.57)
+    );
   }
 
   public static PostPaymentResponse aPostPaymentResponseDeclined() {
-    return PostPaymentResponse.builder()
-        .id(UUID.randomUUID())
-        .amount(BigDecimal.valueOf(100))
-        .currency("USD")
-        .status(PaymentStatus.DECLINED)
-        .expiryMonth(12)
-        .expiryYear(2025)
-        .build();
+    return new PostPaymentResponse(
+        UUID.randomUUID(),
+        PaymentStatus.DECLINED,
+        4321,
+        12,
+        2024,
+        "USD",
+        BigDecimal.valueOf(10.57)
+    );
   }
 
   public static BankProcessorRequest aBankProcessorRequest() {

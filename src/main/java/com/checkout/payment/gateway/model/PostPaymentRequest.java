@@ -1,5 +1,6 @@
 package com.checkout.payment.gateway.model;
 
+import com.checkout.payment.gateway.enums.Currency;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.DecimalMin;
@@ -11,6 +12,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import lombok.Data;
 
 @Data
@@ -53,6 +55,19 @@ public class PostPaymentRequest implements Serializable {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yyyy");
     YearMonth cardExpiry = YearMonth.parse(getExpiryDate(), formatter);
     return cardExpiry.isAfter(YearMonth.now());
+  }
+
+  public void validate() {
+    if (!this.isExpiryDateValid()) {
+      throw new IllegalArgumentException("Card expiration date must be in the future");
+    }
+
+    boolean isValidCurrency = Arrays.stream(Currency.values())
+        .map(Enum::name)
+        .anyMatch(this.getCurrency()::equals);
+    if (!isValidCurrency) {
+      throw new IllegalArgumentException("Currency is invalid");
+    }
   }
 
   @Override
